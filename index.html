@@ -9,7 +9,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
         body { font-family: 'Noto Sans SC', sans-serif; background-color: #09090d; color: #e2e8f0; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        /* Custom scrollbar for MUD logs */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #121218; }
         ::-webkit-scrollbar-thumb { background: #27273a; border-radius: 3px; }
@@ -28,13 +27,10 @@
                 SNORED INDUSTRY ONLINE
             </span>
             <span class="text-zinc-500">|</span>
-            <span class="text-zinc-400">信件 <span id="top-mail" class="text-purple-300 font-mono">0</span></span>
-            <span class="text-zinc-400">公告 <span id="top-announcement" class="text-purple-300 font-mono">1</span></span>
             <span class="text-zinc-400">黑市信誉 <span id="top-reputation" class="text-emerald-400 font-mono">100%</span></span>
         </div>
         <div class="flex items-center gap-4 font-mono">
             <span class="text-zinc-400">生存天数: <strong id="stat-days" class="text-amber-400">1</strong> 天</span>
-            <span class="text-zinc-400">行动算力: <strong id="stat-action" class="text-cyan-400">100 / 100</strong></span>
             <span class="text-zinc-400">黑市负债: <strong id="stat-debt" class="text-rose-400">0</strong> 算力币</span>
             <span class="text-purple-400 bg-purple-950/40 px-2 py-0.5 rounded border border-purple-900/50">当前位置: 第 <span id="stat-floor">1</span> 层 (废土垃圾场)</span>
         </div>
@@ -43,8 +39,25 @@
     <!-- 主布局容器 -->
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 p-3 max-w-[1700px] w-full mx-auto">
 
-        <!-- 左侧面板：玩家资产、员工、自动化策略、数据 -->
+        <!-- 左侧面板：玩家资产、新手任务、自动化策略 -->
         <section class="lg:col-span-3 flex flex-col gap-3">
+            
+            <!-- 新手引导任务面板 (Newbie Quest Panel) -->
+            <div class="cyber-card border-purple-500/40 rounded-xl p-4 flex flex-col gap-2.5 bg-gradient-to-b from-purple-950/20 to-[#121218]">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h3 class="text-xs font-bold tracking-wider uppercase text-purple-300 flex items-center gap-1.5">
+                        <span>📋</span> 废土生存新手引导
+                    </h3>
+                    <span id="quest-progress-text" class="text-[10px] font-mono text-purple-400">步骤 1/3</span>
+                </div>
+                <div id="quest-content" class="text-xs text-zinc-300 flex flex-col gap-2">
+                    <p id="quest-desc" class="font-medium text-zinc-200">目标: 点击下方【手柄搜寻垃圾】按钮，累计搜寻 5 次废土残渣。</p>
+                    <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-zinc-800">
+                        <div id="quest-bar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 玩家基础卡片 -->
             <div class="cyber-card cyber-card-glow rounded-xl p-4 flex flex-col gap-3">
                 <div class="flex justify-between items-start">
@@ -72,7 +85,7 @@
                     </div>
                     <div class="flex justify-between text-xs">
                         <span class="text-zinc-400">每秒净利润:</span>
-                        <span id="player-income" class="text-cyan-400">+0.0 /s</span>
+                        <span id="player-income" class="text-cyan-400">+20.0 /s</span>
                     </div>
                 </div>
 
@@ -85,10 +98,6 @@
                     <div class="flex justify-between text-xs font-mono text-zinc-400">
                         <span>合成芯片/残渣:</span>
                         <span id="res-chips" class="text-zinc-200 font-bold">0</span>
-                    </div>
-                    <div class="flex justify-between text-xs font-mono text-zinc-400">
-                        <span>高阶军用合金:</span>
-                        <span id="res-alloy" class="text-zinc-200 font-bold">0</span>
                     </div>
                 </div>
 
@@ -103,27 +112,17 @@
                 </div>
             </div>
 
-            <!-- AI 自动化策略控制台 (Macro Automation Engine) -->
+            <!-- AI 自动化策略控制台 -->
             <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h3 class="text-xs font-bold tracking-wider uppercase text-purple-400 flex items-center gap-1.5">
                         <span>⚡</span> AI 算法自动化策略
                     </h3>
-                    <span class="text-[10px] bg-purple-950 text-purple-300 px-1.5 py-0.5 rounded font-mono">v4.0</span>
                 </div>
-                <p class="text-[11px] text-zinc-400">开启后，系统将在后台自动执行风控、还款与扩张指令，解放双手以应对长线运营。</p>
                 <div class="flex flex-col gap-2 text-xs">
                     <label class="flex items-center justify-between bg-zinc-900/60 p-2 rounded border border-zinc-800/50 cursor-pointer">
-                        <span class="text-zinc-300">自动还高利贷 (资金>万时)</span>
+                        <span class="text-zinc-300">自动还高利贷</span>
                         <input type="checkbox" id="auto-pay-debt" class="accent-purple-500 w-4 h-4" checked>
-                    </label>
-                    <label class="flex items-center justify-between bg-zinc-900/60 p-2 rounded border border-zinc-800/50 cursor-pointer">
-                        <span class="text-zinc-300">自动扫荡本层敌对势力</span>
-                        <input type="checkbox" id="auto-sweep" class="accent-purple-500 w-4 h-4">
-                    </label>
-                    <label class="flex items-center justify-between bg-zinc-900/60 p-2 rounded border border-zinc-800/50 cursor-pointer">
-                        <span class="text-zinc-300">自动扩建下一层店铺</span>
-                        <input type="checkbox" id="auto-expand" class="accent-purple-500 w-4 h-4">
                     </label>
                 </div>
             </div>
@@ -143,7 +142,7 @@
                         偿还 1 万贷款
                     </button>
                 </div>
-                <p class="text-[10px] text-zinc-500 italic">警告：黑市复利极高，若负债超过总资产 200%，将触发强制资产拍卖与破产重置！</p>
+                <p class="text-[10px] text-zinc-500 italic">提示：开局前几分钟靠工坊自动净收益就能稳步赚钱，无需盲目借贷！</p>
             </div>
         </section>
 
@@ -163,7 +162,7 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h3 class="font-bold text-sm text-zinc-100">第 <span id="current-floor-num">1</span> 层：<span id="current-floor-name">废土垃圾场微型工坊</span></h3>
-                        <p class="text-xs text-zinc-500">上下楼层供应链相互依存。高层店铺需要底层产出源源不断的物料。</p>
+                        <p class="text-xs text-zinc-500">你的第一桶金来源。每秒自动为你产生净利润，支撑你走向宏大商业帝国。</p>
                     </div>
                     <button onclick="openNextFloor()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow flex items-center gap-1 cursor-pointer">
                         <span>🚀 攻坚并开拓下一层</span>
@@ -181,10 +180,10 @@
                         </div>
                         <div class="flex flex-col gap-1 font-mono text-xs text-zinc-400">
                             <div class="flex justify-between"><span>店铺等级:</span> <strong id="shop-level" class="text-zinc-200">1 级</strong></div>
-                            <div class="flex justify-between"><span>日均维护费:</span> <strong id="shop-upkeep" class="text-rose-400">120 /s</strong></div>
-                            <div class="flex justify-between"><span>产出效率:</span> <strong id="shop-output" class="text-emerald-400">+5.0 算力币/s</strong></div>
+                            <div class="flex justify-between"><span>日均维护费:</span> <strong id="shop-upkeep" class="text-rose-400">10 /s</strong></div>
+                            <div class="flex justify-between"><span>产出效率:</span> <strong id="shop-output" class="text-emerald-400">+30.0 算力币/s</strong></div>
                         </div>
-                        <button onclick="upgradeShop()" id="upgrade-shop-btn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold py-2 rounded transition">
+                        <button onclick="upgradeShop()" id="upgrade-shop-btn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold py-2 rounded transition cursor-pointer">
                             升级店铺 (造价: <span id="shop-upgrade-cost">2,500</span> 算力)
                         </button>
                     </div>
@@ -199,7 +198,6 @@
                         </div>
                         <div class="flex flex-col gap-1 font-mono text-xs text-zinc-400">
                             <div class="flex justify-between"><span>物流带宽:</span> <strong class="text-zinc-200">100 Mb/s</strong></div>
-                            <div class="flex justify-between"><span>运输损耗率:</span> <strong class="text-emerald-400">0.5%</strong></div>
                             <div class="flex justify-between"><span>链条稳定性:</span> <strong class="text-cyan-400">99.2%</strong></div>
                         </div>
                         <button onclick="optimizeSupplyChain()" class="w-full bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/40 text-cyan-300 text-xs font-bold py-2 rounded transition">
@@ -220,7 +218,6 @@
                         <span class="text-zinc-400">当前势力: <strong class="text-rose-400" id="faction-name">血齿帮 (BloodTooth Mafia)</strong></span>
                         <span class="text-zinc-400">掌控度: <strong id="faction-control" class="text-amber-400">85%</strong> (未肃清)</span>
                     </div>
-                    <!-- 进度条 -->
                     <div class="w-full bg-zinc-900 h-3 rounded-full overflow-hidden border border-zinc-800">
                         <div id="faction-bar" class="bg-rose-600 h-full transition-all duration-300" style="width: 85%;"></div>
                     </div>
@@ -241,9 +238,7 @@
                     <h3 class="font-bold text-sm text-zinc-100">赛博大厂金融股票局</h3>
                     <p class="text-xs text-zinc-500">通过做多或做空新霓虹四大巨头企业股票获取暴利。小心突发黑天鹅事件！</p>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="stock-market-container">
-                    <!-- 动态生成股票卡片 -->
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="stock-market-container"></div>
             </div>
 
             <!-- Tab 4: 遗产转生 -->
@@ -277,31 +272,18 @@
                     <button onclick="clearLogs()" class="text-[10px] text-zinc-500 hover:text-zinc-300">清空日志</button>
                 </div>
                 <div id="mud-console" class="bg-[#060609] border border-zinc-900 rounded-lg p-3 h-40 overflow-y-auto font-mono text-xs flex flex-col gap-1.5 text-zinc-300">
-                    <div class="text-purple-400">[系统引导] 欢迎来到《Snored Industry Online》废土经营世界。从第 1 层垃圾场开始，建立你的数年长线商业帝国。</div>
+                    <div class="text-purple-400">[系统引导] 欢迎来到《Snored Industry Online》。微型工坊已自动启动，每秒为你带来稳定的净收益！请跟随左上角【新手引导】开始创业。</div>
                 </div>
             </div>
         </section>
 
-        <!-- 右侧面板：楼层纵向地图与快速控制 -->
+        <!-- 右侧面板：楼层纵向地图 -->
         <section class="lg:col-span-3 flex flex-col gap-3">
             <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
                 <h3 class="text-xs font-bold tracking-wider uppercase text-zinc-400 border-b border-zinc-800 pb-2 flex items-center gap-1.5">
                     <span>🏢</span> 无限纵向楼层图谱
                 </h3>
-                <div class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1" id="floor-list-container">
-                    <!-- 楼层列表动态生成 -->
-                </div>
-            </div>
-
-            <div class="cyber-card rounded-xl p-4 flex flex-col gap-3 bg-gradient-to-b from-[#121218] to-[#181222]">
-                <h3 class="text-xs font-bold tracking-wider uppercase text-purple-400 border-b border-zinc-800 pb-2">
-                    💡 长线运营提示
-                </h3>
-                <ul class="text-[11px] text-zinc-400 space-y-1.5 list-disc pl-4">
-                    <li>楼层越高，地租与日常维护费呈<strong class="text-rose-400">指数级增长</strong>。盲目扩张会导致瞬间现金流断裂！</li>
-                    <li>随时关注黑市高利贷与势力掌控度，未肃清的区域会频繁爆发黑帮武装抢劫。</li>
-                    <li>善用左侧的 **AI 自动化策略**，可在长时间挂机时自动还款与防风控。</li>
-                </ul>
+                <div class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1" id="floor-list-container"></div>
             </div>
         </section>
 
@@ -309,7 +291,6 @@
 
     <!-- 游戏主逻辑脚本 -->
     <script>
-        // 游戏全局核心状态
         let gameState = {
             days: 1,
             money: 5000,
@@ -317,15 +298,14 @@
             level: 1,
             title: "底层垃圾搬运工",
             networth: 5000,
-            actionPoints: 100,
-            maxAction: 100,
             currentFloor: 1,
             garbage: 0,
             chips: 0,
-            alloy: 0,
             legacyPoints: 0,
+            questStep: 1, // 1: scavenge 5 times, 2: refine 1 time, 3: upgrade shop
+            questProgress: 0,
             shops: {
-                1: { name: "垃圾分拣与粗加工站", level: 1, upkeep: 120, output: 5, upgradeCost: 2500 }
+                1: { name: "垃圾分拣与粗加工站", level: 1, upkeep: 10, output: 30, upgradeCost: 2500 }
             },
             factions: {
                 1: { name: "血齿帮", control: 85 }
@@ -336,20 +316,13 @@
                 { id: 'cyber', name: '新霓虹算力枢纽', price: 210.0, change: 5.4, owned: 0 },
                 { id: 'under', name: '深渊黑市信托', price: 12.8, change: -0.4, owned: 0 }
             ],
-            techs: { scavenge: 0 },
-            auto: { payDebt: true, sweep: false, expand: false }
+            techs: { scavenge: 0 }
         };
 
-        // 楼层名称库
         const floorNames = {
             1: "第 1 层 · 废土垃圾场微型工坊",
             2: "第 2 层 · 霓虹贫民区地下街",
-            3: "第 3 层 · 废旧电子拆解流水线",
-            4: "第 4 层 · 黑色基因提炼所",
-            5: "第 5 层 · 中层工业联合大厦",
-            10: "第 10 层 · 赛博黑客情报中心",
-            20: "第 20 层 · 巨型企业外围枢纽",
-            50: "第 50 层 · 云端行政董事会"
+            3: "第 3 层 · 废旧电子拆解流水线"
         };
 
         function logMUD(text, type = 'normal') {
@@ -365,7 +338,6 @@
             consoleBox.scrollTop = consoleBox.scrollHeight;
         }
 
-        // Tab 切换
         function switchTab(tabName) {
             ['shop', 'faction', 'stock', 'legacy'].forEach(t => {
                 document.getElementById(`tab-content-${t}`).classList.add('hidden');
@@ -377,30 +349,77 @@
             document.getElementById(`tab-btn-${tabName}`).className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow";
         }
 
-        // 手动操作
+        // 新手任务进度检查
+        function checkQuestProgress() {
+            let descEl = document.getElementById('quest-desc');
+            let barEl = document.getElementById('quest-bar');
+            let progText = document.getElementById('quest-progress-text');
+
+            if (gameState.questStep === 1) {
+                progText.innerText = "步骤 1/3";
+                descEl.innerText = `目标: 点击【手柄搜寻垃圾】，累计搜寻 5 次 (${gameState.questProgress}/5)`;
+                let pct = (gameState.questProgress / 5) * 100;
+                barEl.style.width = `${pct}%`;
+                if (gameState.questProgress >= 5) {
+                    gameState.questStep = 2;
+                    gameState.questProgress = 0;
+                    gameState.money += 2000;
+                    logMUD(`🎁 完成新手任务 1！获得政府发放的创业补贴 2,000 算力币！`, 'gold');
+                }
+            } else if (gameState.questStep === 2) {
+                progText.innerText = "步骤 2/3";
+                descEl.innerText = `目标: 积累 10 单位垃圾后，点击【手动提炼芯片】 1 次 (${gameState.questProgress}/1)`;
+                let pct = (gameState.questProgress / 1) * 100;
+                barEl.style.width = `${pct}%`;
+                if (gameState.questProgress >= 1) {
+                    gameState.questStep = 3;
+                    gameState.questProgress = 0;
+                    gameState.money += 3000;
+                    logMUD(`🎁 完成新手任务 2！获得黑市技术赞助 3,000 算力币！`, 'gold');
+                }
+            } else if (gameState.questStep === 3) {
+                progText.innerText = "步骤 3/3";
+                descEl.innerText = `目标: 资金足够时，点击【升级店铺】提升第 1 层工坊等级 (${gameState.questProgress}/1)`;
+                let pct = (gameState.questProgress / 1) * 100;
+                barEl.style.width = `${pct}%`;
+                if (gameState.questProgress >= 1) {
+                    gameState.questStep = 4;
+                    progText.innerText = "已完成全部引导";
+                    descEl.innerText = `🎉 恭喜！你已完全掌握废土经商之道，向百层大厦进发吧！`;
+                    barEl.style.width = `100%`;
+                    logMUD(`🎉 恭喜通关新手引导任务！未来的赛博巨鳄正在诞生。`, 'gold');
+                }
+            }
+        }
+
         function manualScavenge() {
             let bonus = 1 + (gameState.techs.scavenge * 0.1);
             gameState.garbage += Math.floor(1 * bonus);
             logMUD(`你亲自深入废墟搜寻，获得废土垃圾残渣。`, 'normal');
+            if(gameState.questStep === 1) {
+                gameState.questProgress++;
+            }
             updateUI();
         }
 
         function manualProcess() {
             if(gameState.garbage >= 10) {
                 gameState.garbage -= 10;
-                gameState.chips += 2;
-                logMUD(`你成功将 10 单位垃圾提炼为 2 单位合成芯片。`, 'success');
+                gameState.chips += 1;
+                logMUD(`你成功将 10 单位垃圾提炼为 1 单位合成芯片。`, 'success');
+                if(gameState.questStep === 2) {
+                    gameState.questProgress++;
+                }
                 updateUI();
             } else {
-                logMUD(`废土垃圾不足（需要 10 单位）。`, 'alert');
+                logMUD(`废土垃圾不足（需要 10 单位，当前 ${gameState.garbage}）。多点击左侧按钮搜寻！`, 'alert');
             }
         }
 
-        // 贷款与金融
         function takeLoan(amount) {
             gameState.money += amount;
             gameState.debt += amount;
-            logMUD(`向黑市借贷 ${amount.toLocaleString()} 算力币。利息开始滚动！`, 'alert');
+            logMUD(`向黑市借贷 ${amount.toLocaleString()} 算力币。`, 'alert');
             updateUI();
         }
 
@@ -414,7 +433,6 @@
             }
         }
 
-        // 店铺升级
         function upgradeShop() {
             let floor = gameState.currentFloor;
             let shop = gameState.shops[floor];
@@ -422,17 +440,19 @@
             if(gameState.money >= shop.upgradeCost) {
                 gameState.money -= shop.upgradeCost;
                 shop.level++;
-                shop.output = Math.floor(shop.output * 1.5);
-                shop.upkeep = Math.floor(shop.upkeep * 1.3);
+                shop.output = Math.floor(shop.output * 1.6);
+                shop.upkeep = Math.floor(shop.upkeep * 1.2);
                 shop.upgradeCost = Math.floor(shop.upgradeCost * 2.2);
                 logMUD(`第 ${floor} 层店铺升级成功！当前等级 Lv.${shop.level}。`, 'gold');
+                if(gameState.questStep === 3) {
+                    gameState.questProgress++;
+                }
                 updateUI();
             } else {
-                logMUD(`资金不足，无法升级店铺。`, 'alert');
+                logMUD(`资金不足，无法升级店铺（需要 ${shop.upgradeCost.toLocaleString()}）。`, 'alert');
             }
         }
 
-        // 势力清扫
         function sweepFaction() {
             let floor = gameState.currentFloor;
             let faction = gameState.factions[floor];
@@ -440,28 +460,23 @@
             if(gameState.money >= 1000) {
                 gameState.money -= 1000;
                 faction.control = Math.max(0, faction.control - 15);
-                logMUD(`雇佣黑客小队对第 ${floor} 层进行武装扫荡，势力掌控度下降至 ${faction.control}%。`, 'success');
-                if(faction.control === 0) {
-                    logMUD(`🎉 捷报：第 ${floor} 层势力已被彻底肃清！获得该层绝对话语权与永久免税特权！`, 'gold');
-                }
+                logMUD(`雇佣雇佣兵对第 ${floor} 层进行武装扫荡，掌控度降至 ${faction.control}%。`, 'success');
                 updateUI();
             } else {
-                logMUD(`资金不足（需要 1,000 算力币支付雇佣兵费用）。`, 'alert');
+                logMUD(`资金不足（需要 1,000 算力币）。`, 'alert');
             }
         }
 
         function bribeFaction() {
-            let floor = gameState.currentFloor;
             if(gameState.money >= 500) {
                 gameState.money -= 500;
-                logMUD(`已向当地帮派缴纳保护费，暂时避免了武装袭击。`, 'normal');
+                logMUD(`已向当地帮派缴纳保护费。`, 'normal');
                 updateUI();
             } else {
-                logMUD(`资金不足以支付保护费！`, 'alert');
+                logMUD(`资金不足！`, 'alert');
             }
         }
 
-        // 攻坚下一层
         function openNextFloor() {
             let next = gameState.currentFloor + 1;
             let cost = next * 10000;
@@ -472,22 +487,21 @@
                     gameState.shops[next] = {
                         name: floorNames[next] || `第 ${next} 层高级工业区`,
                         level: 1,
-                        upkeep: next * 250,
-                        output: next * 15,
+                        upkeep: next * 30,
+                        output: next * 60,
                         upgradeCost: next * 8000
                     };
                 }
                 if(!gameState.factions[next]) {
-                    gameState.factions[next] = { name: `第 ${next} 层赛博财团卫队`, control: 100 };
+                    gameState.factions[next] = { name: `第 ${next} 层财团卫队`, control: 100 };
                 }
-                logMUD(`🚀 成功突破封锁，开拓并进驻第 ${next} 层！地租与维护成本大幅上升！`, 'gold');
+                logMUD(`🚀 成功开拓并进驻第 ${next} 层！`, 'gold');
                 updateUI();
             } else {
                 logMUD(`开拓第 ${next} 层需要资金 ${cost.toLocaleString()} 算力币！`, 'alert');
             }
         }
 
-        // 科技树购买
         function buyLegacyTech(type) {
             if(type === 'scavenge' && gameState.legacyPoints >= 100) {
                 gameState.legacyPoints -= 100;
@@ -503,7 +517,7 @@
             document.getElementById('mud-console').innerHTML = '';
         }
 
-        exportSave = function() {
+        function exportSave() {
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameState));
             let downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
@@ -514,7 +528,6 @@
             logMUD(`存档已成功导出。`, 'success');
         }
 
-        // 股票交易逻辑
         function tradeStock(id, amount) {
             let stock = gameState.stocks.find(s => s.id === id);
             if(!stock) return;
@@ -522,7 +535,7 @@
             if(amount > 0 && gameState.money >= cost) {
                 gameState.money -= cost;
                 stock.owned += amount;
-                logMUD(`买入 ${stock.name} ${amount} 股，总计花费 ${cost.toFixed(1)} 算力币。`, 'normal');
+                logMUD(`买入 ${stock.name} ${amount} 股。`, 'normal');
             } else if(amount < 0 && stock.owned >= Math.abs(amount)) {
                 let gain = stock.price * Math.abs(amount);
                 gameState.money += gain;
@@ -532,9 +545,8 @@
             updateUI();
         }
 
-        // 核心循环逻辑 (每秒执行一次)
+        // 核心循环 (每秒执行)
         setInterval(() => {
-            // 计算总收入与总维护费
             let totalIncome = 0;
             let totalUpkeep = 0;
             
@@ -545,38 +557,23 @@
             }
 
             let netIncome = totalIncome - totalUpkeep;
-            gameState.money += netIncome;
+            gameState.money += netIncome; // 正净利润，每秒自动赚钱！
 
-            // 黑市复利利息
             if(gameState.debt > 0) {
-                let interest = gameState.debt * 0.002; // 每秒 0.2% 利息
-                gameState.debt += interest;
+                gameState.debt += gameState.debt * 0.001; // 低利息复利
             }
 
-            // 净资产计算
             gameState.networth = gameState.money - gameState.debt + (gameState.garbage * 2);
 
-            // 检查破产清算
-            if(gameState.networth < -50000) {
-                logMUD(`🚨 资本链彻底断裂！触发强制破产拍卖清算！资产全部归零，跌回第 1 层！`, 'alert');
-                gameState.legacyPoints += Math.floor(gameState.days * 5);
-                gameState.money = 5000;
-                gameState.debt = 0;
-                gameState.currentFloor = 1;
-                gameState.garbage = 0;
-                gameState.days = 1;
-            }
-
-            // 股票行情随机波动
+            // 股票行情波动
             gameState.stocks.forEach(s => {
-                let changePercent = (Math.random() - 0.48) * 3.5;
+                let changePercent = (Math.random() - 0.48) * 3.0;
                 s.price = Math.max(1.0, s.price * (1 + changePercent / 100));
                 s.change = changePercent;
             });
 
-            // 自动策略执行 (Macro Automation)
-            if(document.getElementById('auto-pay-debt').checked && gameState.money > 20000 && gameState.debt > 0) {
-                let pay = Math.min(5000, gameState.money, gameState.debt);
+            if(document.getElementById('auto-pay-debt').checked && gameState.money > 15000 && gameState.debt > 0) {
+                let pay = Math.min(3000, gameState.money, gameState.debt);
                 gameState.money -= pay;
                 gameState.debt -= pay;
             }
@@ -585,10 +582,10 @@
             updateUI();
         }, 1000);
 
-        // 更新 UI 界面渲染
         function updateUI() {
+            checkQuestProgress();
+
             document.getElementById('stat-days').innerText = Math.floor(gameState.days);
-            document.getElementById('stat-action').innerText = `${gameState.actionPoints} / ${gameState.maxAction}`;
             document.getElementById('stat-debt').innerText = Math.floor(gameState.debt).toLocaleString();
             document.getElementById('stat-floor').innerText = gameState.currentFloor;
             document.getElementById('current-floor-num').innerText = gameState.currentFloor;
@@ -606,14 +603,11 @@
             let net = totalIncome - totalUpkeep;
             let incEl = document.getElementById('player-income');
             incEl.innerText = `${net >= 0 ? '+' : ''}${net.toFixed(1)} /s`;
-            incEl.className = net >= 0 ? "text-cyan-400 font-bold" : "text-rose-400 font-bold";
 
             document.getElementById('res-garbage').innerText = gameState.garbage;
             document.getElementById('res-chips').innerText = gameState.chips;
-            document.getElementById('res-alloy').innerText = gameState.alloy;
 
-            // 当前层店铺
-            let floorShop = gameState.shops[gameState.currentFloor] || { name: "基础工坊", level: 1, upkeep: 100, output: 5, upgradeCost: 2000 };
+            let floorShop = gameState.shops[gameState.currentFloor] || { name: "基础工坊", level: 1, upkeep: 10, output: 30, upgradeCost: 2000 };
             document.getElementById('current-floor-name').innerText = floorShop.name;
             document.getElementById('shop-name').innerText = floorShop.name;
             document.getElementById('shop-level').innerText = `${floorShop.level} 级`;
@@ -621,16 +615,13 @@
             document.getElementById('shop-output').innerText = `+${floorShop.output} 算力币/s`;
             document.getElementById('shop-upgrade-cost').innerText = floorShop.upgradeCost.toLocaleString();
 
-            // 势力
             let floorFaction = gameState.factions[gameState.currentFloor] || { name: "地方武装势力", control: 100 };
             document.getElementById('faction-name').innerText = floorFaction.name;
             document.getElementById('faction-control').innerText = `${floorFaction.control}%`;
             document.getElementById('faction-bar').style.width = `${floorFaction.control}%`;
 
-            // 遗产声望
             document.getElementById('legacy-points').innerText = `${gameState.legacyPoints} 点`;
 
-            // 股票列表渲染
             let stockHtml = '';
             gameState.stocks.forEach(s => {
                 let color = s.change >= 0 ? 'text-emerald-400' : 'text-rose-400';
@@ -645,15 +636,14 @@
                             <span class="text-zinc-400">持有: <strong class="text-purple-400">${s.owned} 股</strong></span>
                         </div>
                         <div class="grid grid-cols-2 gap-1 pt-1">
-                            <button onclick="tradeStock('${s.id}', 10)" class="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 text-[11px] py-1 rounded">买入 10股</button>
-                            <button onclick="tradeStock('${s.id}', -10)" class="bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 text-rose-300 text-[11px] py-1 rounded">卖出 10股</button>
+                            <button onclick="tradeStock('${s.id}', 10)" class="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 text-[11px] py-1 rounded cursor-pointer">买入 10股</button>
+                            <button onclick="tradeStock('${s.id}', -10)" class="bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 text-rose-300 text-[11px] py-1 rounded cursor-pointer">卖出 10股</button>
                         </div>
                     </div>
                 `;
             });
             document.getElementById('stock-market-container').innerHTML = stockHtml;
 
-            // 楼层地图渲染
             let floorListHtml = '';
             for(let i = 1; i <= Math.max(5, gameState.currentFloor + 2); i++) {
                 let active = i === gameState.currentFloor;
@@ -668,7 +658,6 @@
             document.getElementById('floor-list-container').innerHTML = floorListHtml;
         }
 
-        // 初始化运行
         updateUI();
     </script>
 </body>
