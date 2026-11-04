@@ -98,6 +98,42 @@
                 </div>
             </div>
 
+            <!-- 体力补给商店模块（政府基础终端 vs 黑市黑店） -->
+            <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
+                <h3 class="text-xs font-bold text-amber-400 border-b border-zinc-800 pb-2 flex items-center justify-between">
+                    <span>🛒 体力补给市场</span>
+                    <span class="text-[10px] text-zinc-500">第 1 层贫民区</span>
+                </h3>
+                
+                <div class="flex flex-col gap-2 font-mono text-xs">
+                    <!-- 政府基础配给站 -->
+                    <div class="bg-zinc-900/60 p-2 rounded border border-zinc-800 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-zinc-300">政府合成营养膏 (官方)</p>
+                            <p class="text-[10px] text-zinc-500">恢复 +25 体力 | 价格: 200 算力</p>
+                        </div>
+                        <button onclick="Game.buyEnergyGov()" class="bg-cyan-950 hover:bg-cyan-900 border border-cyan-800 text-cyan-300 px-2.5 py-1.5 rounded">购买</button>
+                    </div>
+
+                    <!-- 黑市违禁神经兴奋剂 -->
+                    <div class="bg-rose-950/20 p-2 rounded border border-rose-900/40 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-rose-300">黑市神经兴奋剂 (违禁)</p>
+                            <p class="text-[10px] text-zinc-500">瞬间恢复 +100 体力 | 价格: 900 算力</p>
+                        </div>
+                        <button onclick="Game.buyEnergyBlackMarket()" class="bg-rose-950 hover:bg-rose-900 border border-rose-800 text-rose-300 px-2.5 py-1.5 rounded">走私购买</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <button onclick="Game.sellChips()" class="col-span-2 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/40 text-cyan-300 text-xs py-2 rounded transition font-mono">
+                        黑市变现芯片 (售价: 1,500/个)
+                    </button>
+                    <button onclick="Game.takeLoan(10000)" class="bg-amber-950/40 border border-amber-800/40 text-amber-300 text-xs py-1.5 rounded">借高利贷 1万</button>
+                    <button onclick="Game.repayLoan(10000)" class="bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs py-1.5 rounded">偿还 1万</button>
+                </div>
+            </div>
+
             <!-- 自动化与高利贷 -->
             <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
                 <h3 class="text-xs font-bold text-amber-400 border-b border-zinc-800 pb-2">🏦 金融与黑市交易</h3>
