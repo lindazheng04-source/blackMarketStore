@@ -38,4 +38,14 @@ const defaultGameState = {
     hasAutoMachine: false,  // 是否拥有自动提炼机器
     questStep: 1,
     questProgress: 0
+    factions: {
+        1: { name: "血齿帮", control: 85 }
+    },
+    // 股票数据
+    stocks: [
+        { id: 'snored', name: 'Snored Corp 大厂', price: 120.5, change: 2.1, owned: 0 },
+        { id: 'aether', name: '以太生物科技', price: 45.0, change: -1.2, owned: 0 },
+        { id: 'cyber', name: '新霓虹算力枢纽', price: 210.0, change: 5.4, owned: 0 }
+    ],
+    techs: { scavenge: 0 }
 };
