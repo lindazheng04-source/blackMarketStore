@@ -33,6 +33,13 @@ const Game = {
         let netIncome = totalIncome - totalUpkeep;
         this.state.money += netIncome; // 正收益增长
 
+        if (this.state.debt > 0) {
+            this.state.debt += this.state.debt * 0.001;
+        }
+
+        this.state.days += 0.01;
+        this.updateUI();
+
         // 3. 高利贷低利息
         if (this.state.debt > 0) {
             this.state.debt += this.state.debt * 0.001;
@@ -159,7 +166,7 @@ const Game = {
         QuestManager.checkProgress();
 
         document.getElementById('stat-days').innerText = Math.floor(this.state.days);
-        document.getElementById('stat-energy').innerText = `${this.state.energy} / ${CONFIG.MAX_ENERGY}`;
+        document.getElementById('stat-energy').innerText = `${this.state.energy.toFixed(1)} / ${CONFIG.MAX_ENERGY}`;
         document.getElementById('stat-debt').innerText = Math.floor(this.state.debt).toLocaleString();
         document.getElementById('stat-floor').innerText = this.state.currentFloor;
         document.getElementById('current-floor-num').innerText = this.state.currentFloor;
