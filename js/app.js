@@ -40,6 +40,23 @@ const Game = {
         this.state.days += 0.01;
         this.updateUI();
 
+        if (this.state.hasAutoMachine && this.state.garbage >= 2) {
+            this.state.garbage -= 2;
+            this.state.chips += 1;
+        }
+
+        // 日租金扣除（若没有买断）
+        if (this.state.hasShop && !this.state.isOwned) {
+            this.state.money -= (this.state.rentCost / 100); // 摊平为秒级扣除
+        }
+
+        // 股票波动
+        this.state.stocks.forEach(s => {
+            let changePercent = (Math.random() - 0.48) * 3.0;
+            s.price = Math.max(1.0, s.price * (1 + changePercent / 100));
+            s.change = changePercent;
+        });
+
         // 3. 高利贷低利息
         if (this.state.debt > 0) {
             this.state.debt += this.state.debt * 0.001;
@@ -47,6 +64,17 @@ const Game = {
 
         this.state.days += 0.01;
         this.updateUI();
+    },
+
+    switchTab(tabName) {
+        ['shop', 'faction', 'stock', 'legacy'].forEach(t => {
+            document.getElementById(`tab-content-${t}`).classList.add('hidden');
+            document.getElementById(`tab-content-${t}`).classList.remove('flex');
+            document.getElementById(`tab-btn-${t}`).className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white hover:bg-zinc-800";
+        });
+        document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
+        document.getElementById(`tab-content-${tabName}`).classList.add('flex');
+        document.getElementById(`tab-btn-${tabName}`).className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow";
     },
 
     manualScavenge() {
@@ -186,6 +214,83 @@ buyAutoMachine() {
         }
     },
 
+    sellChips() {
+        if (this.state.chips >= 1) {
+            this.state.chips -= 1;
+            this.state.money += CONFIG.CHIP_SELL_PRICE;
+            this.log(`黑市变现 1 个芯片，获得 ${CONFIG.CHIP_SELL_PRICE} 算力币！`, "gold");
+            if (this.state.questStep === 3) this.state.questProgress++;
+            this.updateUI();
+        } else {
+            this.log("手中没有合成芯片！", "alert");
+        }
+    },
+
+    // 体力购买
+    buyEnergyGov() {
+        if (this.state.money >= 200) {
+            this.state.money -= 200;
+            this.state.energy = Math.min(CONFIG.MAX_ENERGY, this.state.energy + 25);
+            this.log("购买政府营养膏，恢复 25 体力。", "success");
+            this.updateUI();
+        }
+    },
+
+    buyEnergyBlackMarket() {
+        if (this.state.money >= 900) {
+            this.state.money -= 900;
+            this.state.energy = Math.min(CONFIG.MAX_ENERGY, this.state.energy + 100);
+            this.log("注射黑市兴奋剂，体力瞬间回复！", "gold");
+            this.updateUI();
+        }
+    },
+
+    // 势力扫荡
+    sweepFaction() {
+        let f = this.state.factions[this.state.currentFloor];
+        if (this.state.money >= 1000 && f) {
+            this.state.money -= 1000;
+            f.control = Math.max(0, f.control - 15);
+            this.log(`扫荡第 ${this.state.currentFloor} 层势力，掌控度升至 ${100 - f.control}%！`, "success");
+            this.updateUI();
+        }
+    },
+
+    bribeFaction() {
+        if (this.state.money >= 500) {
+            this.state.money -= 500;
+            this.log("已缴纳保护费，平安无事。", "normal");
+            this.updateUI();
+        }
+    },
+
+    // 股票交易
+    tradeStock(id, amount) {
+        let stock = this.state.stocks.find(s => s.id === id);
+        if(!stock) return;
+        let cost = stock.price * amount;
+        if(amount > 0 && this.state.money >= cost) {
+            this.state.money -= cost;
+            stock.owned += amount;
+            this.log(`买入 ${stock.name} ${amount} 股。`, "normal");
+        } else if(amount < 0 && stock.owned >= Math.abs(amount)) {
+            let gain = stock.price * Math.abs(amount);
+            this.state.money += gain;
+            stock.owned -= Math.abs(amount);
+            this.log(`卖出 ${stock.name} ${Math.abs(amount)} 股，套现 ${gain.toFixed(1)}！`, "success");
+        }
+        this.updateUI();
+    },
+
+    buyLegacyTech(type) {
+        if (this.state.legacyPoints >= 100) {
+            this.state.legacyPoints -= 100;
+            this.state.techs.scavenge++;
+            this.log("成功解锁纳米回收科技！", "gold");
+            this.updateUI();
+        }
+    },
+
     openNextFloor() {
         let next = this.state.currentFloor + 1;
         let cost = next * 10000;
@@ -223,7 +328,7 @@ buyAutoMachine() {
         consoleBox.scrollTop = consoleBox.scrollHeight;
     },
 
-    updateUI() {
+   updateUI() {
         QuestManager.checkProgress();
 
         document.getElementById('stat-days').innerText = Math.floor(this.state.days);
@@ -232,40 +337,63 @@ buyAutoMachine() {
         document.getElementById('stat-floor').innerText = this.state.currentFloor;
         document.getElementById('current-floor-num').innerText = this.state.currentFloor;
 
-        document.getElementById('player-level').innerText = this.state.level;
         document.getElementById('player-money').innerText = Math.floor(this.state.money).toLocaleString();
         
-        let totalIncome = 0;
-        let totalUpkeep = 0;
-        for (let f in this.state.shops) {
-            totalIncome += this.state.shops[f].output;
-            totalUpkeep += this.state.shops[f].upkeep;
+        // 店铺面板显隐
+        if (this.state.hasShop) {
+            document.getElementById('no-shop-panel').classList.add('hidden');
+            document.getElementById('has-shop-panel').classList.remove('hidden');
+            document.getElementById('has-shop-panel').classList.add('flex');
+            
+            if (this.state.isOwned) {
+                document.getElementById('shop-ownership').innerText = "产权已买断 (免租)";
+                document.getElementById('shop-ownership').className = "text-[10px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-2 py-0.5 rounded font-mono";
+                document.getElementById('buyout-btn').classList.add('hidden');
+            }
+            if (this.state.hasAutoMachine) {
+                document.getElementById('auto-machine-btn').innerText = "🤖 自动提炼流水线 (已安装)";
+                document.getElementById('auto-machine-btn').disabled = true;
+            }
+        } else {
+            document.getElementById('no-shop-panel').classList.remove('hidden');
+            document.getElementById('has-shop-panel').classList.add('hidden');
         }
-        let net = totalIncome - totalUpkeep;
-        document.getElementById('player-income').innerText = `${net >= 0 ? '+' : ''}${net.toFixed(1)} /s`;
 
         document.getElementById('res-garbage').innerText = this.state.garbage;
+        document.getElementById('res-military').innerText = this.state.militaryParts;
+        document.getElementById('res-data').innerText = this.state.dataChips;
         document.getElementById('res-chips').innerText = this.state.chips;
 
-        let shop = this.state.shops[this.state.currentFloor] || { name: "基础工坊", level: 1, upkeep: 10, output: 30, upgradeCostMoney: 2500, upgradeCostChips: 2 };
-        document.getElementById('shop-name').innerText = shop.name;
-        document.getElementById('shop-level').innerText = shop.level;
-        document.getElementById('shop-upkeep').innerText = `${shop.upkeep} /s`;
-        document.getElementById('shop-output').innerText = `+${shop.output} /s`;
-        document.getElementById('shop-upgrade-cost').innerText = shop.upgradeCostMoney.toLocaleString();
-        document.getElementById('shop-upgrade-chips').innerText = shop.upgradeCostChips;
+        // 渲染势力
+        let f = this.state.factions[this.state.currentFloor] || { name: "地方帮派", control: 100 };
+        document.getElementById('faction-name').innerText = f.name;
+        document.getElementById('faction-control').innerText = `${f.control}%`;
+        document.getElementById('faction-bar').style.width = `${f.control}%`;
 
-        let floorListHtml = '';
-        for (let i = 1; i <= Math.max(5, this.state.currentFloor + 1); i++) {
-            let active = i === this.state.currentFloor;
-            floorListHtml += `
-                <div class="flex items-center justify-between p-2 rounded border ${active ? 'bg-purple-950/30 border-purple-500/50 text-purple-300' : 'bg-zinc-900/40 border-zinc-800 text-zinc-400'} text-xs font-mono">
-                    <span>第 ${i} 层</span>
-                    <span class="text-[10px]">${active ? '当前据点' : ''}</span>
+        // 渲染股票
+        let stockHtml = '';
+        this.state.stocks.forEach(s => {
+            let color = s.change >= 0 ? 'text-emerald-400' : 'text-rose-400';
+            stockHtml += `
+                <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-3 flex flex-col justify-between gap-2 font-mono text-xs">
+                    <div class="flex justify-between">
+                        <span class="font-bold text-zinc-200">${s.name}</span>
+                        <span class="${color}">${s.change >= 0 ? '+' : ''}${s.change.toFixed(2)}%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>现价: ${s.price.toFixed(1)}</span>
+                        <span>持有: ${s.owned}股</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-1 pt-1">
+                        <button onclick="Game.tradeStock('${s.id}', 10)" class="bg-emerald-950 border border-emerald-800 text-emerald-300 py-1 rounded">买 10股</button>
+                        <button onclick="Game.tradeStock('${s.id}', -10)" class="bg-rose-950 border border-rose-800 text-rose-300 py-1 rounded">卖 10股</button>
+                    </div>
                 </div>
             `;
-        }
-        document.getElementById('floor-list-container').innerHTML = floorListHtml;
+        });
+        document.getElementById('stock-market-container').innerHTML = stockHtml;
+
+        document.getElementById('legacy-points').innerText = `${this.state.legacyPoints} 点`;
     }
 };
 
