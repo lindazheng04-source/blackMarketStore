@@ -2,7 +2,7 @@ const CONFIG = {
     SAVE_KEY: "snored_industry_save_v2",
     AUTO_SAVE_INTERVAL: 5000, // 5秒自动存盘
     MAX_ENERGY: 100,
-    ENERGY_RECOVER_RATE: 2, // 每秒恢复 2 体力
+    ENERGY_RECOVER_RATE: 0.01, // 调整为极慢的自然回复 (100秒恢复1点)
     CHIP_SELL_PRICE: 1500, // 每个芯片黑市卖 1500 算力币
 };
 
