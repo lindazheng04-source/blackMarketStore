@@ -5,17 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snored Industry Online - 赛博废土帝国经营 MUD</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
-        body { font-family: 'Noto Sans SC', sans-serif; background-color: #09090d; color: #e2e8f0; }
-        .font-mono { font-family: 'JetBrains Mono', monospace; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #121218; }
-        ::-webkit-scrollbar-thumb { background: #27273a; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3f3f5c; }
-        .cyber-card { background: #121218; border: 1px solid #1e1e2f; box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5); }
-        .cyber-card-glow { border-color: rgba(139, 92, 246, 0.3); box-shadow: 0 0 15px rgba(139, 92, 246, 0.08); }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="min-h-screen flex flex-col selection:bg-purple-500 selection:text-white">
 
@@ -27,61 +17,57 @@
                 SNORED INDUSTRY ONLINE
             </span>
             <span class="text-zinc-500">|</span>
-            <span class="text-zinc-400">黑市信誉 <span id="top-reputation" class="text-emerald-400 font-mono">100%</span></span>
+            <span class="text-zinc-400">自动存档: <span id="save-status" class="text-emerald-400 font-mono">已就绪</span></span>
         </div>
         <div class="flex items-center gap-4 font-mono">
             <span class="text-zinc-400">生存天数: <strong id="stat-days" class="text-amber-400">1</strong> 天</span>
+            <span class="text-zinc-400">体力值: <strong id="stat-energy" class="text-cyan-400">100 / 100</strong></span>
             <span class="text-zinc-400">黑市负债: <strong id="stat-debt" class="text-rose-400">0</strong> 算力币</span>
-            <span class="text-purple-400 bg-purple-950/40 px-2 py-0.5 rounded border border-purple-900/50">当前位置: 第 <span id="stat-floor">1</span> 层 (废土垃圾场)</span>
+            <span class="text-purple-400 bg-purple-950/40 px-2 py-0.5 rounded border border-purple-900/50">当前位置: 第 <span id="stat-floor">1</span> 层</span>
         </div>
     </header>
 
     <!-- 主布局容器 -->
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 p-3 max-w-[1700px] w-full mx-auto">
 
-        <!-- 左侧面板：玩家资产、新手任务、自动化策略 -->
+        <!-- 左侧面板 -->
         <section class="lg:col-span-3 flex flex-col gap-3">
             
-            <!-- 新手引导任务面板 (Newbie Quest Panel) -->
+            <!-- 新手引导任务 -->
             <div class="cyber-card border-purple-500/40 rounded-xl p-4 flex flex-col gap-2.5 bg-gradient-to-b from-purple-950/20 to-[#121218]">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h3 class="text-xs font-bold tracking-wider uppercase text-purple-300 flex items-center gap-1.5">
-                        <span>📋</span> 废土生存新手引导
+                        <span>📋</span> 新手引导任务
                     </h3>
                     <span id="quest-progress-text" class="text-[10px] font-mono text-purple-400">步骤 1/3</span>
                 </div>
-                <div id="quest-content" class="text-xs text-zinc-300 flex flex-col gap-2">
-                    <p id="quest-desc" class="font-medium text-zinc-200">目标: 点击下方【手柄搜寻垃圾】按钮，累计搜寻 5 次废土残渣。</p>
+                <div class="text-xs text-zinc-300 flex flex-col gap-2">
+                    <p id="quest-desc" class="font-medium text-zinc-200">目标加载中...</p>
                     <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-zinc-800">
                         <div id="quest-bar" class="bg-purple-500 h-full transition-all duration-300" style="width: 0%;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 玩家基础卡片 -->
+            <!-- 玩家面板 -->
             <div class="cyber-card cyber-card-glow rounded-xl p-4 flex flex-col gap-3">
                 <div class="flex justify-between items-start">
                     <div>
                         <h2 class="font-bold text-base text-zinc-100 flex items-center gap-2">
                             <span>zheng</span> 
-                            <span class="text-xs font-normal px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded-full font-mono">Lv.<span id="player-level">1</span> 废土拾荒者</span>
+                            <span class="text-xs font-normal px-2 py-0.5 bg-zinc-800 text-zinc-400 rounded-full font-mono">Lv.<span id="player-level">1</span> 拾荒者</span>
                         </h2>
-                        <p class="text-xs text-zinc-500 mt-0.5 font-mono">头衔: <span id="player-title" class="text-purple-300">底层垃圾搬运工</span></p>
                     </div>
-                    <div class="text-right">
-                        <button onclick="exportSave()" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded transition">导出存档</button>
+                    <div class="flex gap-1">
+                        <button onclick="StorageManager.saveGame()" class="text-[10px] bg-purple-900/50 hover:bg-purple-800 text-purple-200 px-2 py-1 rounded transition">手动存档</button>
+                        <button onclick="StorageManager.exportSave()" class="text-[10px] bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2 py-1 rounded transition">导出</button>
                     </div>
                 </div>
 
-                <!-- 资产与现金流 -->
                 <div class="bg-[#09090d] rounded-lg p-3 border border-zinc-800/80 flex flex-col gap-2 font-mono">
                     <div class="flex justify-between text-xs">
                         <span class="text-zinc-400">流动资金 (算力币):</span>
                         <span id="player-money" class="text-emerald-400 font-bold text-sm">5,000</span>
-                    </div>
-                    <div class="flex justify-between text-xs">
-                        <span class="text-zinc-400">总资产净值:</span>
-                        <span id="player-networth" class="text-purple-400 font-bold">5,000</span>
                     </div>
                     <div class="flex justify-between text-xs">
                         <span class="text-zinc-400">每秒净利润:</span>
@@ -89,576 +75,90 @@
                     </div>
                 </div>
 
-                <!-- 核心资源筐 -->
-                <div class="flex flex-col gap-1.5">
-                    <div class="flex justify-between text-xs font-mono text-zinc-400">
-                        <span>废土垃圾储量 (筐):</span>
+                <!-- 资源仓库 -->
+                <div class="flex flex-col gap-1.5 font-mono text-xs text-zinc-400">
+                    <div class="flex justify-between">
+                        <span>废土垃圾残渣:</span>
                         <span id="res-garbage" class="text-zinc-200 font-bold">0</span>
                     </div>
-                    <div class="flex justify-between text-xs font-mono text-zinc-400">
-                        <span>合成芯片/残渣:</span>
-                        <span id="res-chips" class="text-zinc-200 font-bold">0</span>
+                    <div class="flex justify-between">
+                        <span>合成芯片 (关键工业品):</span>
+                        <span id="res-chips" class="text-cyan-300 font-bold">0</span>
                     </div>
                 </div>
 
-                <!-- 手动操作区 -->
+                <!-- 手动体力消耗动作 -->
                 <div class="grid grid-cols-2 gap-2 pt-1">
-                    <button onclick="manualScavenge()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 px-3 rounded transition shadow-lg shadow-purple-900/20 active:scale-95 cursor-pointer">
-                        手柄搜寻垃圾 (+1)
+                    <button onclick="Game.manualScavenge()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold py-2 px-3 rounded transition active:scale-95 cursor-pointer">
+                        手柄搜寻 (-5 体力)
                     </button>
-                    <button onclick="manualProcess()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold py-2 px-3 rounded transition active:scale-95 cursor-pointer">
-                        手动提炼芯片
+                    <button onclick="Game.manualProcess()" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold py-2 px-3 rounded transition active:scale-95 cursor-pointer">
+                        提炼芯片 (-10 体力)
                     </button>
                 </div>
             </div>
 
-            <!-- AI 自动化策略控制台 -->
+            <!-- 自动化与高利贷 -->
             <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
-                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                    <h3 class="text-xs font-bold tracking-wider uppercase text-purple-400 flex items-center gap-1.5">
-                        <span>⚡</span> AI 算法自动化策略
-                    </h3>
-                </div>
-                <div class="flex flex-col gap-2 text-xs">
-                    <label class="flex items-center justify-between bg-zinc-900/60 p-2 rounded border border-zinc-800/50 cursor-pointer">
-                        <span class="text-zinc-300">自动还高利贷</span>
-                        <input type="checkbox" id="auto-pay-debt" class="accent-purple-500 w-4 h-4" checked>
-                    </label>
-                </div>
-            </div>
-
-            <!-- 银行与黑市金融借贷 -->
-            <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
-                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                    <h3 class="text-xs font-bold tracking-wider uppercase text-amber-400 flex items-center gap-1.5">
-                        <span>🏦</span> 地下黑市与银行信贷
-                    </h3>
-                </div>
+                <h3 class="text-xs font-bold text-amber-400 border-b border-zinc-800 pb-2">🏦 金融与黑市交易</h3>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="takeLoan(10000)" class="bg-amber-950/40 hover:bg-amber-900/50 border border-amber-800/40 text-amber-300 text-xs py-2 rounded transition font-mono">
-                        借贷 1 万 (高利)
+                    <button onclick="Game.sellChips()" class="col-span-2 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/40 text-cyan-300 text-xs py-2 rounded transition font-mono">
+                        黑市变现芯片 (售价: 1,500/个)
                     </button>
-                    <button onclick="repayLoan(10000)" class="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 text-xs py-2 rounded transition font-mono">
-                        偿还 1 万贷款
-                    </button>
+                    <button onclick="Game.takeLoan(10000)" class="bg-amber-950/40 border border-amber-800/40 text-amber-300 text-xs py-1.5 rounded">借高利贷 1万</button>
+                    <button onclick="Game.repayLoan(10000)" class="bg-emerald-950/40 border border-emerald-800/40 text-emerald-300 text-xs py-1.5 rounded">偿还 1万</button>
                 </div>
-                <p class="text-[10px] text-zinc-500 italic">提示：开局前几分钟靠工坊自动净收益就能稳步赚钱，无需盲目借贷！</p>
             </div>
         </section>
 
-        <!-- 中间主区：Tab页切换、经营、势力、股市、MUD实时日志 -->
+        <!-- 中间面板 -->
         <section class="lg:col-span-6 flex flex-col gap-3">
-            
-            <!-- 导航 Tabs -->
-            <div class="flex bg-[#121218] border border-[#1e1e2f] rounded-xl p-1 gap-1 select-none">
-                <button onclick="switchTab('shop')" id="tab-btn-shop" class="flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow">🏢 产业店铺链</button>
-                <button onclick="switchTab('faction')" id="tab-btn-faction" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white hover:bg-zinc-800">⚔️ 势力与扫荡</button>
-                <button onclick="switchTab('stock')" id="tab-btn-stock" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white hover:bg-zinc-800">📈 赛博股票局</button>
-                <button onclick="switchTab('legacy')" id="tab-btn-legacy" class="flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white hover:bg-zinc-800">🧬 遗产转生</button>
-            </div>
-
-            <!-- Tab 1: 产业店铺链 -->
-            <div id="tab-content-shop" class="cyber-card rounded-xl p-4 flex flex-col gap-4">
+            <div class="cyber-card rounded-xl p-4 flex flex-col gap-4">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h3 class="font-bold text-sm text-zinc-100">第 <span id="current-floor-num">1</span> 层：<span id="current-floor-name">废土垃圾场微型工坊</span></h3>
-                        <p class="text-xs text-zinc-500">你的第一桶金来源。每秒自动为你产生净利润，支撑你走向宏大商业帝国。</p>
+                        <h3 class="font-bold text-sm text-zinc-100">第 <span id="current-floor-num">1</span> 层店铺</h3>
                     </div>
-                    <button onclick="openNextFloor()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow flex items-center gap-1 cursor-pointer">
-                        <span>🚀 攻坚并开拓下一层</span>
+                    <button onclick="Game.openNextFloor()" class="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-2 rounded transition shadow">🚀 进驻下一层</button>
+                </div>
+
+                <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-3 flex flex-col gap-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-bold text-purple-300" id="shop-name">垃圾分拣站</span>
+                        <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono">Lv.<span id="shop-level">1</span></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 font-mono text-xs text-zinc-400">
+                        <div>维护费: <strong id="shop-upkeep" class="text-rose-400">10 /s</strong></div>
+                        <div>基础产出: <strong id="shop-output" class="text-emerald-400">+30 /s</strong></div>
+                    </div>
+                    <button onclick="Game.upgradeShop()" class="w-full bg-purple-900/40 hover:bg-purple-800/50 border border-purple-700/50 text-purple-200 text-xs font-bold py-2 rounded transition">
+                        升级店铺 (需要: <span id="shop-upgrade-cost">2500</span> 算力币 + <span id="shop-upgrade-chips">2</span> 芯片)
                     </button>
                 </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-3 flex flex-col justify-between gap-3">
-                        <div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-purple-300" id="shop-name">垃圾分拣与粗加工站</span>
-                                <span class="text-[10px] bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded font-mono" id="shop-status">运行中</span>
-                            </div>
-                            <p class="text-xs text-zinc-400 mt-1" id="shop-desc">自动将周围废墟的垃圾转化为可销售的电子残渣与初级资金流。</p>
-                        </div>
-                        <div class="flex flex-col gap-1 font-mono text-xs text-zinc-400">
-                            <div class="flex justify-between"><span>店铺等级:</span> <strong id="shop-level" class="text-zinc-200">1 级</strong></div>
-                            <div class="flex justify-between"><span>日均维护费:</span> <strong id="shop-upkeep" class="text-rose-400">10 /s</strong></div>
-                            <div class="flex justify-between"><span>产出效率:</span> <strong id="shop-output" class="text-emerald-400">+30.0 算力币/s</strong></div>
-                        </div>
-                        <button onclick="upgradeShop()" id="upgrade-shop-btn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-bold py-2 rounded transition cursor-pointer">
-                            升级店铺 (造价: <span id="shop-upgrade-cost">2,500</span> 算力)
-                        </button>
-                    </div>
-
-                    <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-3 flex flex-col justify-between gap-3">
-                        <div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs font-bold text-cyan-300">供应链自动化矩阵</span>
-                                <span class="text-[10px] bg-cyan-950 text-cyan-400 px-2 py-0.5 rounded font-mono">互联正常</span>
-                            </div>
-                            <p class="text-xs text-zinc-400 mt-1">打通底层与高层之间的物流通道。防止因区域断供导致的连锁破产。</p>
-                        </div>
-                        <div class="flex flex-col gap-1 font-mono text-xs text-zinc-400">
-                            <div class="flex justify-between"><span>物流带宽:</span> <strong class="text-zinc-200">100 Mb/s</strong></div>
-                            <div class="flex justify-between"><span>链条稳定性:</span> <strong class="text-cyan-400">99.2%</strong></div>
-                        </div>
-                        <button onclick="optimizeSupplyChain()" class="w-full bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-800/40 text-cyan-300 text-xs font-bold py-2 rounded transition">
-                            优化物流网络 (消耗 5,000 算力)
-                        </button>
-                    </div>
-                </div>
             </div>
 
-            <!-- Tab 2: 势力与扫荡 -->
-            <div id="tab-content-faction" class="cyber-card rounded-xl p-4 hidden flex-col gap-4">
-                <div>
-                    <h3 class="font-bold text-sm text-zinc-100">本层区域势力掌控度</h3>
-                    <p class="text-xs text-zinc-500">每层都有当地的帮派或执法队盘踞。不彻底清扫将面临随机武装袭击与高额保护费剥削。</p>
-                </div>
-                <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-4 flex flex-col gap-3">
-                    <div class="flex justify-between text-xs font-mono">
-                        <span class="text-zinc-400">当前势力: <strong class="text-rose-400" id="faction-name">血齿帮 (BloodTooth Mafia)</strong></span>
-                        <span class="text-zinc-400">掌控度: <strong id="faction-control" class="text-amber-400">85%</strong> (未肃清)</span>
-                    </div>
-                    <div class="w-full bg-zinc-900 h-3 rounded-full overflow-hidden border border-zinc-800">
-                        <div id="faction-bar" class="bg-rose-600 h-full transition-all duration-300" style="width: 85%;"></div>
-                    </div>
-                    <div class="flex gap-2 pt-2">
-                        <button onclick="bribeFaction()" class="flex-1 bg-amber-950/40 hover:bg-amber-900/50 border border-amber-800/40 text-amber-300 text-xs font-bold py-2.5 rounded transition">
-                            交纳保护费 (免灾 1 小时)
-                        </button>
-                        <button onclick="sweepFaction()" class="flex-2 bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 text-rose-300 text-xs font-bold py-2.5 rounded transition">
-                            ⚔️ 派出黑客/雇佣兵武装扫荡 (+15%)
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab 3: 赛博股票局 -->
-            <div id="tab-content-stock" class="cyber-card rounded-xl p-4 hidden flex-col gap-4">
-                <div>
-                    <h3 class="font-bold text-sm text-zinc-100">赛博大厂金融股票局</h3>
-                    <p class="text-xs text-zinc-500">通过做多或做空新霓虹四大巨头企业股票获取暴利。小心突发黑天鹅事件！</p>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="stock-market-container"></div>
-            </div>
-
-            <!-- Tab 4: 遗产转生 -->
-            <div id="tab-content-legacy" class="cyber-card rounded-xl p-4 hidden flex-col gap-4">
-                <div>
-                    <h3 class="font-bold text-sm text-zinc-100">永久遗产与科技树 (Legacy Code)</h3>
-                    <p class="text-xs text-zinc-500">当经营失败触发破产清算时，你的商业帝国将化为永久声望，用于点亮跨越世代的科技树。</p>
-                </div>
-                <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-4 flex flex-col gap-3 font-mono text-xs">
-                    <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                        <span class="text-zinc-400">当前累计遗产声望点数:</span>
-                        <span id="legacy-points" class="text-purple-400 font-bold text-base">0 点</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-zinc-200">纳米级垃圾回收纳米虫</p>
-                            <p class="text-[10px] text-zinc-500">永久提升手动与自动拾荒效率 +10% / 级</p>
-                        </div>
-                        <button onclick="buyLegacyTech('scavenge')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded text-xs">解锁 (消耗 100点)</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- MUD 实时文字终端日志 -->
+            <!-- MUD 日志终端 -->
             <div class="cyber-card rounded-xl p-3 flex flex-col gap-2">
                 <div class="flex justify-between items-center text-xs text-zinc-400 border-b border-zinc-800 pb-1">
-                    <span class="font-mono uppercase tracking-wider flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
-                        MUD 实时动态终端日志
-                    </span>
-                    <button onclick="clearLogs()" class="text-[10px] text-zinc-500 hover:text-zinc-300">清空日志</button>
+                    <span class="font-mono">MUD 实时终端日志</span>
                 </div>
-                <div id="mud-console" class="bg-[#060609] border border-zinc-900 rounded-lg p-3 h-40 overflow-y-auto font-mono text-xs flex flex-col gap-1.5 text-zinc-300">
-                    <div class="text-purple-400">[系统引导] 欢迎来到《Snored Industry Online》。微型工坊已自动启动，每秒为你带来稳定的净收益！请跟随左上角【新手引导】开始创业。</div>
-                </div>
+                <div id="mud-console" class="bg-[#060609] border border-zinc-900 rounded-lg p-3 h-48 overflow-y-auto font-mono text-xs flex flex-col gap-1.5"></div>
             </div>
         </section>
 
-        <!-- 右侧面板：楼层纵向地图 -->
+        <!-- 右侧面板 -->
         <section class="lg:col-span-3 flex flex-col gap-3">
             <div class="cyber-card rounded-xl p-4 flex flex-col gap-3">
-                <h3 class="text-xs font-bold tracking-wider uppercase text-zinc-400 border-b border-zinc-800 pb-2 flex items-center gap-1.5">
-                    <span>🏢</span> 无限纵向楼层图谱
-                </h3>
-                <div class="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1" id="floor-list-container"></div>
+                <h3 class="text-xs font-bold text-zinc-400 border-b border-zinc-800 pb-2">🏢 楼层图谱</h3>
+                <div class="flex flex-col gap-2" id="floor-list-container"></div>
             </div>
         </section>
 
     </main>
 
-    <!-- 游戏主逻辑脚本 -->
-    <script>
-        let gameState = {
-            days: 1,
-            money: 5000,
-            debt: 0,
-            level: 1,
-            title: "底层垃圾搬运工",
-            networth: 5000,
-            currentFloor: 1,
-            garbage: 0,
-            chips: 0,
-            legacyPoints: 0,
-            questStep: 1, // 1: scavenge 5 times, 2: refine 1 time, 3: upgrade shop
-            questProgress: 0,
-            shops: {
-                1: { name: "垃圾分拣与粗加工站", level: 1, upkeep: 10, output: 30, upgradeCost: 2500 }
-            },
-            factions: {
-                1: { name: "血齿帮", control: 85 }
-            },
-            stocks: [
-                { id: 'snored', name: 'Snored Corp 大厂', price: 120.5, change: 2.1, owned: 0 },
-                { id: 'aether', name: '以太生物科技', price: 45.0, change: -1.2, owned: 0 },
-                { id: 'cyber', name: '新霓虹算力枢纽', price: 210.0, change: 5.4, owned: 0 },
-                { id: 'under', name: '深渊黑市信托', price: 12.8, change: -0.4, owned: 0 }
-            ],
-            techs: { scavenge: 0 }
-        };
-
-        const floorNames = {
-            1: "第 1 层 · 废土垃圾场微型工坊",
-            2: "第 2 层 · 霓虹贫民区地下街",
-            3: "第 3 层 · 废旧电子拆解流水线"
-        };
-
-        function logMUD(text, type = 'normal') {
-            const consoleBox = document.getElementById('mud-console');
-            const div = document.createElement('div');
-            let colorClass = "text-zinc-300";
-            if(type === 'alert') colorClass = "text-rose-400 font-bold";
-            if(type === 'success') colorClass = "text-emerald-400";
-            if(type === 'gold') colorClass = "text-amber-400 font-bold";
-            div.className = colorClass;
-            div.innerText = `[${new Date().toLocaleTimeString()}] ${text}`;
-            consoleBox.appendChild(div);
-            consoleBox.scrollTop = consoleBox.scrollHeight;
-        }
-
-        function switchTab(tabName) {
-            ['shop', 'faction', 'stock', 'legacy'].forEach(t => {
-                document.getElementById(`tab-content-${t}`).classList.add('hidden');
-                document.getElementById(`tab-content-${t}`).classList.remove('flex');
-                document.getElementById(`tab-btn-${t}`).className = "flex-1 py-2 text-xs font-bold rounded-lg transition text-zinc-400 hover:text-white hover:bg-zinc-800";
-            });
-            document.getElementById(`tab-content-${tabName}`).classList.remove('hidden');
-            document.getElementById(`tab-content-${tabName}`).classList.add('flex');
-            document.getElementById(`tab-btn-${tabName}`).className = "flex-1 py-2 text-xs font-bold rounded-lg transition bg-purple-600 text-white shadow";
-        }
-
-        // 新手任务进度检查
-        function checkQuestProgress() {
-            let descEl = document.getElementById('quest-desc');
-            let barEl = document.getElementById('quest-bar');
-            let progText = document.getElementById('quest-progress-text');
-
-            if (gameState.questStep === 1) {
-                progText.innerText = "步骤 1/3";
-                descEl.innerText = `目标: 点击【手柄搜寻垃圾】，累计搜寻 5 次 (${gameState.questProgress}/5)`;
-                let pct = (gameState.questProgress / 5) * 100;
-                barEl.style.width = `${pct}%`;
-                if (gameState.questProgress >= 5) {
-                    gameState.questStep = 2;
-                    gameState.questProgress = 0;
-                    gameState.money += 2000;
-                    logMUD(`🎁 完成新手任务 1！获得政府发放的创业补贴 2,000 算力币！`, 'gold');
-                }
-            } else if (gameState.questStep === 2) {
-                progText.innerText = "步骤 2/3";
-                descEl.innerText = `目标: 积累 10 单位垃圾后，点击【手动提炼芯片】 1 次 (${gameState.questProgress}/1)`;
-                let pct = (gameState.questProgress / 1) * 100;
-                barEl.style.width = `${pct}%`;
-                if (gameState.questProgress >= 1) {
-                    gameState.questStep = 3;
-                    gameState.questProgress = 0;
-                    gameState.money += 3000;
-                    logMUD(`🎁 完成新手任务 2！获得黑市技术赞助 3,000 算力币！`, 'gold');
-                }
-            } else if (gameState.questStep === 3) {
-                progText.innerText = "步骤 3/3";
-                descEl.innerText = `目标: 资金足够时，点击【升级店铺】提升第 1 层工坊等级 (${gameState.questProgress}/1)`;
-                let pct = (gameState.questProgress / 1) * 100;
-                barEl.style.width = `${pct}%`;
-                if (gameState.questProgress >= 1) {
-                    gameState.questStep = 4;
-                    progText.innerText = "已完成全部引导";
-                    descEl.innerText = `🎉 恭喜！你已完全掌握废土经商之道，向百层大厦进发吧！`;
-                    barEl.style.width = `100%`;
-                    logMUD(`🎉 恭喜通关新手引导任务！未来的赛博巨鳄正在诞生。`, 'gold');
-                }
-            }
-        }
-
-        function manualScavenge() {
-            let bonus = 1 + (gameState.techs.scavenge * 0.1);
-            gameState.garbage += Math.floor(1 * bonus);
-            logMUD(`你亲自深入废墟搜寻，获得废土垃圾残渣。`, 'normal');
-            if(gameState.questStep === 1) {
-                gameState.questProgress++;
-            }
-            updateUI();
-        }
-
-        function manualProcess() {
-            if(gameState.garbage >= 10) {
-                gameState.garbage -= 10;
-                gameState.chips += 1;
-                logMUD(`你成功将 10 单位垃圾提炼为 1 单位合成芯片。`, 'success');
-                if(gameState.questStep === 2) {
-                    gameState.questProgress++;
-                }
-                updateUI();
-            } else {
-                logMUD(`废土垃圾不足（需要 10 单位，当前 ${gameState.garbage}）。多点击左侧按钮搜寻！`, 'alert');
-            }
-        }
-
-        function takeLoan(amount) {
-            gameState.money += amount;
-            gameState.debt += amount;
-            logMUD(`向黑市借贷 ${amount.toLocaleString()} 算力币。`, 'alert');
-            updateUI();
-        }
-
-        function repayLoan(amount) {
-            let pay = Math.min(amount, gameState.money, gameState.debt);
-            if(pay > 0) {
-                gameState.money -= pay;
-                gameState.debt -= pay;
-                logMUD(`成功偿还黑市贷款 ${pay.toLocaleString()} 算力币。`, 'success');
-                updateUI();
-            }
-        }
-
-        function upgradeShop() {
-            let floor = gameState.currentFloor;
-            let shop = gameState.shops[floor];
-            if(!shop) return;
-            if(gameState.money >= shop.upgradeCost) {
-                gameState.money -= shop.upgradeCost;
-                shop.level++;
-                shop.output = Math.floor(shop.output * 1.6);
-                shop.upkeep = Math.floor(shop.upkeep * 1.2);
-                shop.upgradeCost = Math.floor(shop.upgradeCost * 2.2);
-                logMUD(`第 ${floor} 层店铺升级成功！当前等级 Lv.${shop.level}。`, 'gold');
-                if(gameState.questStep === 3) {
-                    gameState.questProgress++;
-                }
-                updateUI();
-            } else {
-                logMUD(`资金不足，无法升级店铺（需要 ${shop.upgradeCost.toLocaleString()}）。`, 'alert');
-            }
-        }
-
-        function sweepFaction() {
-            let floor = gameState.currentFloor;
-            let faction = gameState.factions[floor];
-            if(!faction) return;
-            if(gameState.money >= 1000) {
-                gameState.money -= 1000;
-                faction.control = Math.max(0, faction.control - 15);
-                logMUD(`雇佣雇佣兵对第 ${floor} 层进行武装扫荡，掌控度降至 ${faction.control}%。`, 'success');
-                updateUI();
-            } else {
-                logMUD(`资金不足（需要 1,000 算力币）。`, 'alert');
-            }
-        }
-
-        function bribeFaction() {
-            if(gameState.money >= 500) {
-                gameState.money -= 500;
-                logMUD(`已向当地帮派缴纳保护费。`, 'normal');
-                updateUI();
-            } else {
-                logMUD(`资金不足！`, 'alert');
-            }
-        }
-
-        function openNextFloor() {
-            let next = gameState.currentFloor + 1;
-            let cost = next * 10000;
-            if(gameState.money >= cost) {
-                gameState.money -= cost;
-                gameState.currentFloor = next;
-                if(!gameState.shops[next]) {
-                    gameState.shops[next] = {
-                        name: floorNames[next] || `第 ${next} 层高级工业区`,
-                        level: 1,
-                        upkeep: next * 30,
-                        output: next * 60,
-                        upgradeCost: next * 8000
-                    };
-                }
-                if(!gameState.factions[next]) {
-                    gameState.factions[next] = { name: `第 ${next} 层财团卫队`, control: 100 };
-                }
-                logMUD(`🚀 成功开拓并进驻第 ${next} 层！`, 'gold');
-                updateUI();
-            } else {
-                logMUD(`开拓第 ${next} 层需要资金 ${cost.toLocaleString()} 算力币！`, 'alert');
-            }
-        }
-
-        function buyLegacyTech(type) {
-            if(type === 'scavenge' && gameState.legacyPoints >= 100) {
-                gameState.legacyPoints -= 100;
-                gameState.techs.scavenge++;
-                logMUD(`成功升级纳米回收科技 Lv.${gameState.techs.scavenge}`, 'success');
-                updateUI();
-            } else {
-                logMUD(`遗产声望点数不足！`, 'alert');
-            }
-        }
-
-        function clearLogs() {
-            document.getElementById('mud-console').innerHTML = '';
-        }
-
-        function exportSave() {
-            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(gameState));
-            let downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `snored_industry_save_${Date.now()}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            logMUD(`存档已成功导出。`, 'success');
-        }
-
-        function tradeStock(id, amount) {
-            let stock = gameState.stocks.find(s => s.id === id);
-            if(!stock) return;
-            let cost = stock.price * amount;
-            if(amount > 0 && gameState.money >= cost) {
-                gameState.money -= cost;
-                stock.owned += amount;
-                logMUD(`买入 ${stock.name} ${amount} 股。`, 'normal');
-            } else if(amount < 0 && stock.owned >= Math.abs(amount)) {
-                let gain = stock.price * Math.abs(amount);
-                gameState.money += gain;
-                stock.owned -= Math.abs(amount);
-                logMUD(`卖出 ${stock.name} ${Math.abs(amount)} 股，套现 ${gain.toFixed(1)} 算力币。`, 'success');
-            }
-            updateUI();
-        }
-
-        // 核心循环 (每秒执行)
-        setInterval(() => {
-            let totalIncome = 0;
-            let totalUpkeep = 0;
-            
-            for(let f in gameState.shops) {
-                let shop = gameState.shops[f];
-                totalIncome += shop.output;
-                totalUpkeep += shop.upkeep;
-            }
-
-            let netIncome = totalIncome - totalUpkeep;
-            gameState.money += netIncome; // 正净利润，每秒自动赚钱！
-
-            if(gameState.debt > 0) {
-                gameState.debt += gameState.debt * 0.001; // 低利息复利
-            }
-
-            gameState.networth = gameState.money - gameState.debt + (gameState.garbage * 2);
-
-            // 股票行情波动
-            gameState.stocks.forEach(s => {
-                let changePercent = (Math.random() - 0.48) * 3.0;
-                s.price = Math.max(1.0, s.price * (1 + changePercent / 100));
-                s.change = changePercent;
-            });
-
-            if(document.getElementById('auto-pay-debt').checked && gameState.money > 15000 && gameState.debt > 0) {
-                let pay = Math.min(3000, gameState.money, gameState.debt);
-                gameState.money -= pay;
-                gameState.debt -= pay;
-            }
-
-            gameState.days += 0.01;
-            updateUI();
-        }, 1000);
-
-        function updateUI() {
-            checkQuestProgress();
-
-            document.getElementById('stat-days').innerText = Math.floor(gameState.days);
-            document.getElementById('stat-debt').innerText = Math.floor(gameState.debt).toLocaleString();
-            document.getElementById('stat-floor').innerText = gameState.currentFloor;
-            document.getElementById('current-floor-num').innerText = gameState.currentFloor;
-
-            document.getElementById('player-level').innerText = gameState.level;
-            document.getElementById('player-money').innerText = Math.floor(gameState.money).toLocaleString();
-            document.getElementById('player-networth').innerText = Math.floor(gameState.networth).toLocaleString();
-            
-            let totalIncome = 0;
-            let totalUpkeep = 0;
-            for(let f in gameState.shops) {
-                totalIncome += gameState.shops[f].output;
-                totalUpkeep += gameState.shops[f].upkeep;
-            }
-            let net = totalIncome - totalUpkeep;
-            let incEl = document.getElementById('player-income');
-            incEl.innerText = `${net >= 0 ? '+' : ''}${net.toFixed(1)} /s`;
-
-            document.getElementById('res-garbage').innerText = gameState.garbage;
-            document.getElementById('res-chips').innerText = gameState.chips;
-
-            let floorShop = gameState.shops[gameState.currentFloor] || { name: "基础工坊", level: 1, upkeep: 10, output: 30, upgradeCost: 2000 };
-            document.getElementById('current-floor-name').innerText = floorShop.name;
-            document.getElementById('shop-name').innerText = floorShop.name;
-            document.getElementById('shop-level').innerText = `${floorShop.level} 级`;
-            document.getElementById('shop-upkeep').innerText = `${floorShop.upkeep} /s`;
-            document.getElementById('shop-output').innerText = `+${floorShop.output} 算力币/s`;
-            document.getElementById('shop-upgrade-cost').innerText = floorShop.upgradeCost.toLocaleString();
-
-            let floorFaction = gameState.factions[gameState.currentFloor] || { name: "地方武装势力", control: 100 };
-            document.getElementById('faction-name').innerText = floorFaction.name;
-            document.getElementById('faction-control').innerText = `${floorFaction.control}%`;
-            document.getElementById('faction-bar').style.width = `${floorFaction.control}%`;
-
-            document.getElementById('legacy-points').innerText = `${gameState.legacyPoints} 点`;
-
-            let stockHtml = '';
-            gameState.stocks.forEach(s => {
-                let color = s.change >= 0 ? 'text-emerald-400' : 'text-rose-400';
-                stockHtml += `
-                    <div class="bg-[#09090d] border border-zinc-800 rounded-lg p-3 flex flex-col justify-between gap-2 font-mono">
-                        <div class="flex justify-between items-start">
-                            <span class="text-xs font-bold text-zinc-200">${s.name}</span>
-                            <span class="text-xs ${color}">${s.change >= 0 ? '+' : ''}${s.change.toFixed(2)}%</span>
-                        </div>
-                        <div class="flex justify-between text-xs">
-                            <span class="text-zinc-400">现价: <strong class="text-zinc-100">${s.price.toFixed(1)}</strong></span>
-                            <span class="text-zinc-400">持有: <strong class="text-purple-400">${s.owned} 股</strong></span>
-                        </div>
-                        <div class="grid grid-cols-2 gap-1 pt-1">
-                            <button onclick="tradeStock('${s.id}', 10)" class="bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 text-emerald-300 text-[11px] py-1 rounded cursor-pointer">买入 10股</button>
-                            <button onclick="tradeStock('${s.id}', -10)" class="bg-rose-950/40 hover:bg-rose-900/50 border border-rose-800/40 text-rose-300 text-[11px] py-1 rounded cursor-pointer">卖出 10股</button>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('stock-market-container').innerHTML = stockHtml;
-
-            let floorListHtml = '';
-            for(let i = 1; i <= Math.max(5, gameState.currentFloor + 2); i++) {
-                let active = i === gameState.currentFloor;
-                let unlocked = i <= gameState.currentFloor;
-                floorListHtml += `
-                    <div class="flex items-center justify-between p-2 rounded border ${active ? 'bg-purple-950/30 border-purple-500/50 text-purple-300' : 'bg-zinc-900/40 border-zinc-800 text-zinc-400'} text-xs font-mono">
-                        <span>第 ${i} 层 ${unlocked ? '(已开拓)' : '(未开拓)'}</span>
-                        <span class="text-[10px] ${active ? 'text-purple-400 font-bold' : 'text-zinc-600'}">${active ? '当前据点' : ''}</span>
-                    </div>
-                `;
-            }
-            document.getElementById('floor-list-container').innerHTML = floorListHtml;
-        }
-
-        updateUI();
-    </script>
+    <!-- 脚本加载（按顺序模块化加载） -->
+    <script src="js/config.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/quest.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
