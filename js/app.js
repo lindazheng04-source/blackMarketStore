@@ -89,6 +89,67 @@ const Game = {
         }
     },
 
+    // 在 Game 对象里增加接待客人与买断逻辑：
+
+// 1. 租用首店
+rentFirstShop() {
+    if (this.state.money >= CONFIG.FIRST_RENT_COST) {
+        this.state.money -= CONFIG.FIRST_RENT_COST;
+        this.state.hasShop = true;
+        this.log("🎉 恭喜！你成功租下了第 1 层的第一个破旧街角店铺，正式开业！", "gold");
+        this.updateUI();
+    } else {
+        this.log(`资金不足！租下首家店铺需要 ${CONFIG.FIRST_RENT_COST} 算力币。`, "alert");
+    }
+},
+
+// 2. 接待客人
+serveGuest() {
+    if (!this.state.hasShop) {
+        this.log("你还没有店铺，无法接待客人！请先攒钱租下店铺。", "alert");
+        return;
+    }
+    if (this.state.energy < 8) {
+        this.log("体力不足，无法招待客人！", "alert");
+        return;
+    }
+
+    this.state.energy -= 8;
+    // 随机一位客人光临
+    const guest = GUEST_TYPES[Math.floor(Math.random() * GUEST_TYPES.length)];
+    const amount = Math.floor(Math.random() * (guest.max - guest.min + 1)) + guest.min;
+    
+    this.state.inventory[guest.rewardType] += amount;
+    this.log(`接待了【${guest.name}】(${guest.desc})，获得物资 x${amount}！`, "success");
+    this.updateUI();
+},
+
+// 3. 买断店铺产权
+buyoutShop() {
+    const cost = this.state.rentCost * 100; // 例如 20,000 买断
+    if (this.state.money >= cost) {
+        this.state.money -= cost;
+        this.state.isOwned = true;
+        this.log("🏢 财大气粗！你直接买断了该店铺的土地产权，从此永久免除租金！", "gold");
+        this.updateUI();
+    } else {
+        this.log(`买断产权需要 ${cost} 算力币！`, "alert");
+    }
+},
+
+// 4. 购买自动提炼机器
+buyAutoMachine() {
+    const cost = 15000;
+    if (this.state.money >= cost) {
+        this.state.money -= cost;
+        this.state.hasAutoMachine = true;
+        this.log("🤖 成功在店里安装了【自动提炼流水线机器】！每秒会自动为你提炼物资！", "gold");
+        this.updateUI();
+    } else {
+        this.log(`自动化提炼机器售价 ${cost} 算力币！`, "alert");
+    }
+}
+    
     upgradeShop() {
         let shop = this.state.shops[this.state.currentFloor];
         if (!shop) return;
