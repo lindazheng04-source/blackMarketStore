@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+body { 
+    font-family: 'Noto Sans SC', sans-serif; 
+    background-color: #09090d; 
+    color: #e2e8f0; 
+}
+
+.font-mono { 
+    font-family: 'JetBrains Mono', monospace; 
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #121218; }
+::-webkit-scrollbar-thumb { background: #27273a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3f3f5c; }
+
+.cyber-card { 
+    background: #121218; 
+    border: 1px solid #1e1e2f; 
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5); 
+}
+
+.cyber-card-glow { 
+    border-color: rgba(139, 92, 246, 0.3); 
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.08); 
+}
