@@ -13,23 +13,19 @@ const Game = {
     },
 
     tick() {
-        // 體力微量自然恢復
         if (this.state.energy < CONFIG.MAX_ENERGY) {
             this.state.energy = Math.min(CONFIG.MAX_ENERGY, this.state.energy + CONFIG.ENERGY_RECOVER_RATE);
         }
 
-        // 自動提煉流水線機器運行：每秒消耗 2 垃圾生成 1 芯片
         if (this.state.hasAutoMachine && this.state.garbage >= 2) {
             this.state.garbage -= 2;
             this.state.chips += 1;
         }
 
-        // 日租金扣除（若未買斷產權）
         if (this.state.hasShop && !this.state.isOwned) {
             this.state.money -= (this.state.rentCost / 100); 
         }
 
-        // 股票隨機波動
         if (this.state.stocks) {
             this.state.stocks.forEach(s => {
                 let changePercent = (Math.random() - 0.48) * 3.0;
@@ -42,7 +38,6 @@ const Game = {
         this.updateUI();
     },
 
-    // 切換 Tab 標籤頁
     switchTab(tabName) {
         ['shop', 'faction', 'stock', 'legacy'].forEach(t => {
             const content = document.getElementById(`tab-content-${t}`);
@@ -95,7 +90,6 @@ const Game = {
         this.updateUI();
     },
 
-    // 店鋪與接待客人
     rentFirstShop() {
         if (this.state.money >= CONFIG.FIRST_RENT_COST) {
             this.state.money -= CONFIG.FIRST_RENT_COST;
@@ -321,6 +315,22 @@ const Game = {
             safeSetText('faction-control', `${f.control}%`);
             const bar = document.getElementById('faction-bar');
             if (bar) bar.style.width = `${f.control}%`;
+        }
+
+        // 渲染樓層圖譜
+        const floorListContainer = document.getElementById('floor-list-container');
+        if (floorListContainer) {
+            let floorListHtml = '';
+            for (let i = 1; i <= Math.max(5, (this.state.currentFloor || 1) + 1); i++) {
+                let active = i === (this.state.currentFloor || 1);
+                floorListHtml += `
+                    <div class="flex items-center justify-between p-2 rounded border ${active ? 'bg-purple-950/30 border-purple-500/50 text-purple-300' : 'bg-zinc-900/40 border-zinc-800 text-zinc-400'} text-xs font-mono">
+                        <span>第 ${i} 層</span>
+                        <span class="text-[10px]">${active ? '當前據點' : ''}</span>
+                    </div>
+                `;
+            }
+            floorListContainer.innerHTML = floorListHtml;
         }
 
         // 渲染股票
