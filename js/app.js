@@ -8,7 +8,7 @@ const Game = {
         setInterval(() => this.tick(), 1000);
         setInterval(() => StorageManager.saveGame(), CONFIG.AUTO_SAVE_INTERVAL);
 
-        this.log("系統已從本地緩存恢復狀態。遊戲核心迴圈正常運行中。", "gold");
+        this.log("系統已載入。廢土帝國商業引導已啟動。", "gold");
         this.updateUI();
     },
 
@@ -63,13 +63,15 @@ const Game = {
 
     manualScavenge() {
         if (this.state.energy < 5) {
-            this.log("體力不足！", "alert");
+            this.log("體力不足！請前往左側購買營養膏或黑市興奮劑。", "alert");
             return;
         }
         this.state.energy -= 5;
         this.state.garbage += 1;
         this.log("深入廢墟搜尋垃圾 (+1)，消耗 5 體力。", "normal");
-        if (this.state.questStep === 1) this.state.questProgress++;
+        if (this.state.questStep === 1) {
+            this.state.questProgress = (this.state.questProgress || 0) + 1;
+        }
         this.updateUI();
     },
 
@@ -86,7 +88,9 @@ const Game = {
         this.state.garbage -= 10;
         this.state.chips += 1;
         this.log("成功提煉出 1 個【高純度合成芯片】！", "success");
-        if (this.state.questStep === 2) this.state.questProgress++;
+        if (this.state.questStep === 2) {
+            this.state.questProgress = (this.state.questProgress || 0) + 1;
+        }
         this.updateUI();
     },
 
@@ -97,7 +101,7 @@ const Game = {
             this.log("🎉 成功租下第 1 層的破舊店鋪，正式開業！", "gold");
             this.updateUI();
         } else {
-            this.log(`資金不足！租下首店需要 ${CONFIG.FIRST_RENT_COST} 算力幣。`, "alert");
+            this.log(`資金不足！租下首店需要 ${CONFIG.FIRST_RENT_COST.toLocaleString()} 算力幣。`, "alert");
         }
     },
 
@@ -109,8 +113,8 @@ const Game = {
         this.state.energy -= 8;
         const guest = GUEST_TYPES[Math.floor(Math.random() * GUEST_TYPES.length)];
         const amount = Math.floor(Math.random() * (guest.max - guest.min + 1)) + guest.min;
-        this.state[guest.rewardType] += amount;
-        this.log(`接待【${guest.name}】，獲得 ${guest.desc} x${amount}！`, "success");
+        this.state[guest.rewardType] = (this.state[guest.rewardType] || 0) + amount;
+        this.log(`接待【${guest.name}】(${guest.desc})，獲得物资 x${amount}！`, "success");
         this.updateUI();
     },
 
@@ -122,7 +126,7 @@ const Game = {
             this.log("🤖 成功在店裡安裝【自動提煉流水線】！每秒自動消耗垃圾產出芯片！", "gold");
             this.updateUI();
         } else {
-            this.log(`自動化提煉機器售價 ${cost} 算力幣！`, "alert");
+            this.log(`自動化提煉機器售價 ${cost.toLocaleString()} 算力幣！`, "alert");
         }
     },
 
@@ -134,7 +138,7 @@ const Game = {
             this.log("🏢 買斷店鋪產權，從此永久免除租金！", "gold");
             this.updateUI();
         } else {
-            this.log(`買斷產權需要 ${cost} 算力幣！`, "alert");
+            this.log(`買斷產權需要 ${cost.toLocaleString()} 算力幣！`, "alert");
         }
     },
 
@@ -142,8 +146,10 @@ const Game = {
         if (this.state.chips >= 1) {
             this.state.chips -= 1;
             this.state.money += CONFIG.CHIP_SELL_PRICE;
-            this.log(`黑市變現 1 個芯片，獲得 ${CONFIG.CHIP_SELL_PRICE} 算力幣！`, "gold");
-            if (this.state.questStep === 3) this.state.questProgress++;
+            this.log(`黑市變現 1 個芯片，獲得 ${CONFIG.CHIP_SELL_PRICE.toLocaleString()} 算力幣！`, "gold");
+            if (this.state.questStep === 3) {
+                this.state.questProgress = (this.state.questProgress || 0) + 1;
+            }
             this.updateUI();
         } else {
             this.log("手中沒有合成芯片可出售！", "alert");
@@ -226,11 +232,14 @@ const Game = {
     },
 
     openNextFloor() {
-        let next = this.state.currentFloor + 1;
+        let next = (this.state.currentFloor || 1) + 1;
         let cost = next * 10000;
         if (this.state.money >= cost) {
             this.state.money -= cost;
             this.state.currentFloor = next;
+            if (!this.state.factions[next]) {
+                this.state.factions[next] = { name: `第 ${next} 層財團衛隊`, control: 100 };
+            }
             this.log(`🚀 進駐第 ${next} 層！`, "gold");
             this.updateUI();
         } else {
@@ -249,6 +258,7 @@ const Game = {
     },
 
     updateUI() {
+        // 安全呼叫新手任務檢查
         if (typeof QuestManager !== 'undefined' && QuestManager.checkProgress) {
             QuestManager.checkProgress();
         }
@@ -317,7 +327,7 @@ const Game = {
             if (bar) bar.style.width = `${f.control}%`;
         }
 
-        // 渲染樓層圖譜
+        // 渲染右側樓層圖譜
         const floorListContainer = document.getElementById('floor-list-container');
         if (floorListContainer) {
             let floorListHtml = '';
@@ -346,7 +356,7 @@ const Game = {
                             <span class="${color}">${s.change >= 0 ? '+' : ''}${s.change.toFixed(2)}%</span>
                         </div>
                         <div class="flex justify-between">
-                            <span>現價: ${s.price.toFixed(1)}</span>
+                            <span>現价: ${s.price.toFixed(1)}</span>
                             <span>持有: ${s.owned}股</span>
                         </div>
                         <div class="grid grid-cols-2 gap-1 pt-1">
